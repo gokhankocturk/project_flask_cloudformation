@@ -61,10 +61,14 @@ Resources:
           FromPort: 22
           ToPort: 22
           CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 8081
+          ToPort: 8081
+          CidrIp: 0.0.0.0/0
 
 Outputs:
   webSiteURL:
     Description: URL of Gokhan Website
     Value: !Sub
       - http://${PublicDNS}
-      - PublicDNS: !GetAtt myWebServer.PublicDnsName
+      - PublicDNS: !GetAtt gokhanServer.PublicDnsName
