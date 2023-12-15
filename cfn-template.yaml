@@ -36,8 +36,10 @@ Resources:
       UserData: !Base64 |
         #! /bin/bash
         dnf update -y
+        dnf install wget
         dnf install python3 -y
-        pip3 install flask
+        dnf install python3-pip -y
+        pip3 install flask==2.3.3
         cd /home/ec2-user
         FOLDER="https://raw.githubusercontent.com/gokhankocturk/project_flask_cloudformation/main"
         wget ${FOLDER}/app.py
@@ -61,11 +63,6 @@ Resources:
           FromPort: 22
           ToPort: 22
           CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 8081
-          ToPort: 8081
-          CidrIp: 0.0.0.0/0
-
 Outputs:
   webSiteURL:
     Description: URL of Gokhan Website
