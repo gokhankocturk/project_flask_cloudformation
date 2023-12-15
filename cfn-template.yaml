@@ -1,16 +1,70 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: |
+  Gokhan Kocturk - Flask Project
+
+Parameters:
+  SSMimage:
+    Type: "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>"
+    Default: "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64"
+
+  AWSkeypair:
+    Description: Choose your keypair
+    Type: AWS::EC2::KeyPair::KeyName
+    Default: write_your_keyname
+
+  CUSTOMinstancetype:
+    Description: Choose your instance type
+    Type: String
+    Default: t2.micro
+    AllowedValues:
+      - t2.micro
+      - t3.micro
+      - t2.large
 
 Resources:
-  
-Outputs: 
-  
+  gokhanServer:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref SSMimage
+      InstanceType: !Ref CUSTOMinstancetype
+      KeyName: !Ref AWSkeypair
+      SecurityGroupIds:
+        - !Ref gokhanSec # !GetAtt mySecGrp.GroupId
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}
+      UserData: !Base64 |
+        #! /bin/bash
+        dnf update -y
+        dnf install python3 -y
+        pip3 install flask
+        cd /home/ec2-user
+        FOLDER="https://raw.githubusercontent.com/gokhankocturk/project_flask_cloudformation/main"
+        wget ${FOLDER}/app.py
+        mkdir templates ; cd templates
+        wget ${FOLDER}/templates/index.html
+        wget ${FOLDER}/templates/result.html
+        cd ..
+        python3 app.py
 
+  gokhanSec:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: ssh and http # Required
+      GroupName: gokhan-project-scgrp
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
 
-
-
-
-
-
-
-
+Outputs:
+  webSiteURL:
+    Description: URL of Gokhan Website
+    Value: !Sub
+      - http://${PublicDNS}
+      - PublicDNS: !GetAtt myWebServer.PublicDnsName
