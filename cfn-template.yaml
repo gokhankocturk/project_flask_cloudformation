@@ -10,7 +10,7 @@ Parameters:
   AWSkeypair:
     Description: Choose your keypair
     Type: AWS::EC2::KeyPair::KeyName
-    Default: write_your_keyname
+    Default: mykey
 
   CUSTOMinstancetype:
     Description: Choose your instance type
